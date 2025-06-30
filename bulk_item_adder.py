@@ -8,11 +8,10 @@ import tkinter as tk
 from tkinter import ttk
 import re
 import openpyxl
+import win32com.client
 
-# Initialize Faker for generating random data
 fake = Faker()
 
-# Unit choices (can be modified as needed)
 UNIT_CHOICES = [
     ('Millimeter', 'Millimeter'),
     ('Centimeter', 'Centimeter'),
@@ -332,6 +331,15 @@ class ProductTemplateGenerator:
             batches.append(batch)
         return batches
     
+    def excel_open_and_save(self, filepath):
+        excel = win32com.client.Dispatch("Excel.Application")
+        excel.Visible = False
+        excel.DisplayAlerts = False
+        wb = excel.Workbooks.Open(filepath)
+        wb.Save()
+        wb.Close()
+        excel.Quit()
+
     def save_updated_template(self, new_item_data):
         print(f"Preparing to save {len(new_item_data)} items...")
         try:
@@ -351,12 +359,11 @@ class ProductTemplateGenerator:
                 output_path = os.path.join(original_dir, output_filename)
                 updated_data = self.existing_data.copy()
                 updated_data['Item Template'] = batch_data
-                with pd.ExcelWriter(output_path, engine='openpyxl') as writer:
+                with pd.ExcelWriter(output_path, engine='xlsxwriter') as writer:
                     for sheet_name, df in updated_data.items():
                         df.to_excel(writer, sheet_name=sheet_name, index=False)
-                # After saving with pandas
-                wb = openpyxl.load_workbook(output_path)
-                wb.save(output_path)
+                # Open and save in Excel to normalize the file
+                self.excel_open_and_save(output_path)
                 saved_files.append(output_path)
                 print(f"   Saved batch {batch_number}/{total_batches}: {output_filename} ({len(batch_data)} items)")
             self.display_summary(new_item_data, saved_files)
@@ -409,7 +416,6 @@ def main():
         print("pip install pandas openpyxl faker")
         return
     
-    # Create and run the generator
     generator = ProductTemplateGenerator()
     generator.run()
 
