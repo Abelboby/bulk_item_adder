@@ -37,7 +37,7 @@ class ProductTemplateGeneratorGUI:
     def __init__(self, root):
         self.root = root
         self.root.title("Bulk Item Adder Wizard")
-        self.root.geometry("600x400")
+        self.root.geometry("600x700")
         self.template_file = None
         self.existing_data = {}
         self.brand_codes = []
@@ -261,7 +261,7 @@ class ProductTemplateGeneratorGUI:
                 'bar_qr_code': self.generate_barcode(barcode_option, i),
                 'brand_code': random.choice(brands),
                 'category_code': random.choice(categories),
-                'image_url': self.generate_image_url() if include_images else "",
+                'item_image': self.generate_image_url() if include_images else "",
                 'tax_code': random.choice(tax_codes),
                 'hsn_code': self.generate_random_hsn(),
                 'unit': random.choice(UNIT_CHOICES)[0]
@@ -345,7 +345,7 @@ class ProductTemplateGeneratorGUI:
         tk.Label(self.root, text=f"Categories used: {len(item_data['category_code'].unique())}").pack()
         tk.Label(self.root, text=f"Tax codes used: {len(item_data['tax_code'].unique())}").pack()
         tk.Label(self.root, text=f"Items with barcodes: {len(item_data[item_data['bar_qr_code'] != ''])}").pack()
-        tk.Label(self.root, text=f"Items with image URLs: {len(item_data[item_data['image_url'] != ''])}").pack()
+        tk.Label(self.root, text=f"Items with image URLs: {len(item_data[item_data['item_image'] != ''])}").pack()
         tk.Label(self.root, text="Generated Files:").pack(pady=5)
         for i, file_path in enumerate(saved_files, 1):
             tk.Label(self.root, text=f"{i}. {os.path.basename(file_path)}").pack()
